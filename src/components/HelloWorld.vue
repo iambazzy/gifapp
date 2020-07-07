@@ -1,4 +1,5 @@
 <template>
+<!-- Templatee-->
   <div class="container"> 
       <div class="row">
         <div class="col-lg-12 head text-center">Gif Search Engine</div>
