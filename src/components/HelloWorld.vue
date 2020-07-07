@@ -17,8 +17,13 @@
       <div v-else>
         <div class="row gif-container">
           <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 col gif-card" v-for="(gif, index) in gifs" :key="index"> 
-             <img class="my-image" :src="gif.realUrl" height="100%" width="100%"  />
+             <img @click="openBox(gif)" class="my-image" :src="gif.realUrl" height="100%" width="100%"  />
           </div>  
+        </div>
+      </div>
+      <div id="overlay" @click="closeBox()"> 
+        <div class="overlay-img">
+          <img id="over-img" height="200px"  />
         </div>
       </div>
   </div>
@@ -30,13 +35,22 @@ import axios from 'axios';
 
 @Component
 export default class HelloWorld extends Vue {
-
   gifs: any = [];
   loading = true;
   searchVal = '';
+  lightboxOpen = false;
 
   mounted() {
     this.getData();
+  }
+
+  openBox({realUrl} : any) {
+    (document as any).getElementById('overlay').style.display = 'block';
+    (document as any).getElementById('over-img').src = realUrl;
+  }
+
+  closeBox() {
+    (document as any).getElementById('overlay').style.display = 'none';
   }
 
   searchGif() {
@@ -45,6 +59,7 @@ export default class HelloWorld extends Vue {
       axios.get(`https://api.giphy.com/v1/gifs/search?api_key=abG2UewkaFdc33MLZ0JcAe48WbopEDIy&q=${this.searchVal}&limit=25&offset=0&rating=g&lang=en`)
       .then((resp) => {
         if (this.gifs.length > 0) {
+          this.loading = false;
           this.gifs = [];
           const { data : { data } } = resp;
           data.forEach((el: any) => {
@@ -54,7 +69,6 @@ export default class HelloWorld extends Vue {
             }
           this.gifs.push(dataObj);
           })
-         this.loading = false;
         }
       })
       .catch((err)=> {
@@ -80,8 +94,6 @@ export default class HelloWorld extends Vue {
       console.log(err)
     })
   }
-
-
 }
 </script>
 
@@ -153,7 +165,26 @@ export default class HelloWorld extends Vue {
   justify-content: center;
   align-items: center;
 }
-
+#overlay {
+  position: fixed;
+  display: none;
+  width: 100%; 
+  height: 100%; 
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5); 
+  z-index: 2; 
+  cursor: pointer;
+}
+.overlay-img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 3%
+}
 @media only screen and (max-width: 420px) {
  .gif-card {
     height: 160px;
@@ -172,7 +203,6 @@ export default class HelloWorld extends Vue {
    justify-content: center;
  }
 }
-
 @media only screen and (max-width: 380px) {
  .search-bar {
    width: 180px;
